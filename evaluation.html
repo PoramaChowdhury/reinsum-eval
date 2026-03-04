@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary Evaluation - Evaluate</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div id="evaluation-page" class="page active container-large">
+        <div class="header-status">
+            <h2 id="progress-text">Article 1 of X</h2>
+        </div>
+
+        <div class="original-article-box">
+            <div class="label-badge">Original Article</div>
+            <p id="original-text"></p>
+        </div>
+
+        <h3 class="instructions">Rate the anonymous summaries (1 = Poor, 5 = Excellent):</h3>
+        <div id="eval-error" class="error-msg hidden"></div>
+
+        <div id="summaries-grid" class="grid">
+            <!-- Summaries injected via JS -->
+        </div>
+
+        <div class="actions">
+            <button type="button" id="next-btn" class="btn btn-dark">Next Article &rarr;</button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

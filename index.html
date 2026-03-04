@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary Evaluation - Start</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div id="welcome-page" class="page active container">
+        <div class="card">
+            <div class="text-center">
+                <h1>Summary Evaluation</h1>
+                <p>Please provide your details to begin.</p>
+            </div>
+            
+            <div id="form-error" class="error-msg hidden"></div>
+
+            <div id="user-form">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="age" placeholder="e.g. 20" min="15" max="100">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender">
+                        <option value="">Select Gender...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Major / Field of Study</label>
+                    <input type="text" id="major" placeholder="e.g. Computer Science">
+                </div>
+                <button type="button" id="start-btn" class="btn btn-primary">Start Evaluation</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
