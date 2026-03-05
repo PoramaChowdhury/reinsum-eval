@@ -3,7 +3,7 @@ const supabaseUrl = 'https://yvcrcorrbtgcodajyumo.supabase.co';
 const supabaseKey = 'sb_publishable_VFx1p3mjoHRSqF_A1n7g6A_DnL4N_Zh';  
 const supabaseClient = window.supabase ? supabase.createClient(supabaseUrl, supabaseKey) : null;
 
-const ALL_MODELS = ['Human', 'Model_C', 'Hybrid', 'AbsRL_FastText', 'Duel_Encoder', 'SFT', 'Model_D'];
+const ALL_MODELS = ['Human', 'Model_C', 'Hybrid', 'SFT', 'Model_D'];
 
 function shuffleArray(array) {
     const newArr = [...array];
@@ -90,32 +90,32 @@ if (document.getElementById('evaluation-page')) {
                     <h4>Summary ${idx + 1}</h4>
                     <p>${article[modelName]}</p>
                 </div>
-                <div class="rating-footer">
-                    <span style="font-size:0.9rem; font-weight:600; color:#6b7280;">Rating:</span>
-                    <div class="stars" data-model="${modelName}">
-                        <span class="star" data-value="1">★</span>
-                        <span class="star" data-value="2">★</span>
-                        <span class="star" data-value="3">★</span>
-                        <span class="star" data-value="4">★</span>
-                        <span class="star" data-value="5">★</span>
+                <div class="rating-footer" style="display: flex; flex-direction: column; gap: 10px; align-items: stretch; border-top: 1px solid var(--border); padding-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size:0.9rem; font-weight:600; color:#6b7280;">Rating:</span>
+                        <span style="font-size:1rem; font-weight:700; color:var(--primary);" id="val-${modelName}">Not rated</span>
+                    </div>
+                    <input type="range" min="1" max="5" step="0.5" value="1" class="slider" data-model="${modelName}">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #9ca3af;">
+                        <span>1 (Poor)</span>
+                        <span>5 (Excellent)</span>
                     </div>
                 </div>
             `;
             grid.appendChild(card);
         });
 
-        document.querySelectorAll('.stars').forEach(starContainer => {
-            const model = starContainer.getAttribute('data-model');
-            const stars = starContainer.querySelectorAll('.star');
-
-            stars.forEach(star => {
-                star.addEventListener('click', (e) => {
-                    const value = parseInt(e.target.getAttribute('data-value'));
-                    currentRatings[model] = value;
-                    stars.forEach(s => {
-                        s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= value);
-                    });
-                });
+        // Setup Slider events
+        document.querySelectorAll('.slider').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value); 
+                const model = e.target.getAttribute('data-model');
+                
+                // Update text to show exact decimal (e.g. 4.2 / 5.0)
+                document.getElementById(`val-${model}`).textContent = val.toFixed(1) + " / 5.0";
+                
+                // Save rating to state
+                currentRatings[model] = val;
             });
         });
     }
@@ -125,7 +125,7 @@ if (document.getElementById('evaluation-page')) {
         const btn = e.target;
         
         if (Object.keys(currentRatings).length < ALL_MODELS.length) {
-            errorBox.textContent = "Please provide a rating for all summaries.";
+            errorBox.textContent = "Please adjust the slider to rate all summaries before continuing.";
             errorBox.classList.remove('hidden');
             return;
         }
@@ -142,7 +142,7 @@ if (document.getElementById('evaluation-page')) {
         }));
 
         try {
-            const { error } = await supabaseClient.from('ratings').insert(payload);
+            const { error } = await supabaseClient.from('ratings_v2').insert(payload);
             if (error) throw error;
 
             if (currentArticleIndex < EVALUATION_DATA.length - 1) {
