@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Model Testing - Bangla Summarization</title>
+    <!-- Links to your existing CSS file -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Extra styling for the testing interface */
+        .test-container {
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-family: Arial, sans-serif;
+        }
+        .input-box, .output-box {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .btn {
+            margin-top: 20px; 
+            padding: 12px 24px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn:hover { background: #0056b3; }
+        .btn:disabled { background: #cccccc; cursor: not-allowed; }
+        #loading-indicator {
+            display: none; 
+            margin-top: 15px; 
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .output-box { background: #f8f9fa; min-height: 120px; }
+        
+        /* Navigation bar styling */
+        .nav-bar {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: -20px;
+        }
+        .nav-link {
+            text-decoration: none; 
+            color: #007bff; 
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .nav-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <!-- Link to go back to your main evaluation page -->
+    <div class="nav-bar">
+        <a href="index.html" class="nav-link">&larr; Back to Evaluation Home</a>
+    </div>
+
+    <div class="test-container">
+        <h2>Live Bangla Model Testing</h2>
+        <p>Paste any Bangla text below to generate a summary using your Hugging Face hosted model.</p>
+
+        <!-- Dropdown to select different models -->
+        <label for="model-select"><strong>Select Model:</strong></label><br>
+        <select id="model-select" class="input-box" style="margin-bottom: 20px; cursor: pointer;">
+            <!-- This assumes you named your Hugging Face repository "banglat5-scst-ppo-final" -->
+            <option value="ibz18/banglat5-scst-ppo-final">BanglaT5 SCST PPO Final</option>
+            <!-- You can add your baseline model here later if you upload it! -->
+            <!-- <option value="ibz18/banglat5-sft-baseline">Baseline SFT</option> -->
+        </select>
+
+        <label for="live-input"><strong>Input Text (Bangla):</strong></label>
+        <textarea id="live-input" class="input-box" rows="8" placeholder="এখানে আপনার বাংলা টেক্সট দিন... (Paste Bangla text here)"></textarea>
+        
+        <button id="generate-btn" class="btn">Generate Summary</button>
+        
+        <div id="loading-indicator">⏳ Model is processing... (If the model was asleep, this might take 15-30 seconds to wake up)</div>
+
+        <h3 style="margin-top: 30px;">Generated Summary:</h3>
+        <div id="live-output" class="output-box">
+            The generated summary will appear here.
+        </div>
+    </div>
+
+    <script>
+        // Your Hugging Face API Token
+        const HF_TOKEN = "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"; 
+
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            const inputText = document.getElementById('live-input').value;
+            const outputBox = document.getElementById('live-output');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const generateBtn = document.getElementById('generate-btn');
+            const selectedModel = document.getElementById('model-select').value;
+
+            if (!inputText.trim()) {
+                alert("Please enter some text!");
+                return;
+            }
+
+            // Prepare the UI for loading
+            loadingIndicator.style.display = 'block';
+            outputBox.textContent = '';
+            generateBtn.disabled = true;
+
+            const MODEL_URL = `https://api-inference.huggingface.co/models/${selectedModel}`;
+
+            try {
+                const response = await fetch(MODEL_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${HF_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        inputs: inputText,
+                        parameters: {
+                            max_new_tokens: 128,
+                            truncation: true
+                        }
+                    })
+                });
+
+                const data = await response.json();
+
+                // Handle Hugging Face "Cold Start"
+                if (data.error && data.estimated_time) {
+                    outputBox.innerHTML = `<span style="color: #d9534f;"><b>Model is waking up!</b><br>Estimated wait time: ${Math.round(data.estimated_time)} seconds.<br>Please wait and click "Generate Summary" again.</span>`;
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Failed to generate summary.");
+                }
+
+                // Display the Output
+                if (Array.isArray(data) && data.length > 0 && data[0].generated_text) {
+                    outputBox.textContent = data[0].generated_text; 
+                } else if (data.generated_text) {
+                    outputBox.textContent = data.generated_text;
+                } else {
+                    outputBox.textContent = JSON.stringify(data); 
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                outputBox.textContent = "Error: " + error.message;
+            } finally {
+                loadingIndicator.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
