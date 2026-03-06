@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summary Evaluation - Start</title>
+    <title>Objective Evaluation of RL-Optimized Bangla Abstractive Summarization model</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div id="welcome-page" class="page active container">
         <div class="card">
-            <div class="text-center">
-                <h1>Summary Evaluation</h1>
-                <p>Please provide your details to begin.</p>
+            <!-- UPDATED TITLE SECTION -->
+            <div class="text-center" style="margin-bottom: 2rem;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">
+                    Objective Evaluation
+                </span>
+                <h1 style="font-size: 1.35rem; line-height: 1.3; margin-top: 0.5rem; margin-bottom: 0.5rem; color: var(--dark);">
+                    RL-Optimized Bangla Abstractive Summarization Model
+                </h1>
+                <p style="font-size: 0.95rem;">Please provide your details to begin.</p>
             </div>
             
             <div id="form-error" class="error-msg hidden"></div>
@@ -28,7 +34,6 @@
                         <option value="">Select Gender...</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
-                    
                     </select>
                 </div>
                 <div class="form-group">
@@ -39,26 +44,6 @@
             </div>
         </div>
     </div>
-
-<!-- Live Model Testing Section -->
-<div style="max-width: 900px; margin: 40px auto; padding: 20px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <h2 style="text-align: center; color: #333;">Live Model Testing</h2>
-    <p style="text-align: center; color: #666; margin-bottom: 20px;">
-        Test the custom BanglaT5 SCST+PPO model directly below.
-    </p>
-    
-    <!-- This iframe securely loads your Hugging Face Space directly into your website -->
-    <iframe
-        src="https://ibz18-bangla-summarizer-demo.hf.space"
-        frameborder="0"
-        width="100%"
-        height="600"
-        style="border: 1px solid #ddd; border-radius: 8px;"
-    ></iframe>
-</div>
-
-
-
     <script src="app.js"></script>
 </body>
 </html>
