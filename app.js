@@ -1,4 +1,4 @@
-// Initialize Supabase 
+
 const supabaseUrl = 'https://yvcrcorrbtgcodajyumo.supabase.co';  
 const supabaseKey = 'sb_publishable_VFx1p3mjoHRSqF_A1n7g6A_DnL4N_Zh';  
 const supabaseClient = window.supabase ? supabase.createClient(supabaseUrl, supabaseKey) : null;
@@ -164,8 +164,54 @@ if (document.getElementById('evaluation-page')) {
         }
     });
 }
+// --- PAGE 3: LIVE-TEST.HTML ---
+if (document.getElementById('live-test-page')) {
+    const evaluatorId = sessionStorage.getItem('evaluatorId');
+    if (!evaluatorId) {
+        // Optional: you can redirect to index.html if you want strict flow
+        console.warn("No evaluator ID found. Make sure user started from index.html.");
+    }
 
-// --- PAGE 3: THANKS.HTML ---
+    document.getElementById('submit-live-btn').addEventListener('click', async (e) => {
+        const btn = e.target;
+        const errorBox = document.getElementById('live-error');
+        const slider = document.getElementById('live-slider');
+        const score = parseFloat(slider.value);
+
+        if (!evaluatorId) {
+            errorBox.textContent = "Session error: Please go back to start page to register.";
+            errorBox.classList.remove('hidden');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+        errorBox.classList.add('hidden');
+
+        try {
+            // Reusing ratings_v2 table. Article index 999 = Live test rating.
+            const { error } = await supabaseClient.from('ratings_v2').insert([{
+                evaluator_id: evaluatorId,
+                article_index: 999, 
+                model_name: 'Live_Demo_HF',
+                score: score
+            }]);
+            
+            if (error) throw error;
+            
+            // On success, redirect to the thank you page
+            window.location.href = 'thanks.html';
+        } catch (err) {
+            console.error("Error saving live rating:", err);
+            errorBox.textContent = "Failed to save rating. Try again.";
+            errorBox.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = "Submit Rating & Finish";
+        }
+    });
+}
+
+// --- PAGE 4: THANKS.HTML ---
 if (document.getElementById('thanks-page')) {
     sessionStorage.clear(); // Clears memory so they can't hit "back"
 }
